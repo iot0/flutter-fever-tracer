@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mr_doctor/pages/tabs.dart';
+import 'package:mr_doctor/pages/splash_screen.dart';
 import 'package:mr_doctor/providers/device.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Fever Tracer",
-      home: AppTabBar(),
+      home: SplashScreen(),
     );
   }
 }
