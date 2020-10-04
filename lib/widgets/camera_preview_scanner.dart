@@ -18,21 +18,16 @@ class CameraPreviewScanner extends StatefulWidget {
 class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
   dynamic _scanResults;
   CameraController _camera;
-  Detector _currentDetector = Detector.text;
+  Detector _currentDetector = Detector.face;
   bool _isDetecting = false;
-  CameraLensDirection _direction = CameraLensDirection.back;
+  CameraLensDirection _direction = CameraLensDirection.front;
 
-  final BarcodeDetector _barcodeDetector =
-      FirebaseVision.instance.barcodeDetector();
-  final FaceDetector _faceDetector = FirebaseVision.instance.faceDetector();
-  final ImageLabeler _imageLabeler = FirebaseVision.instance.imageLabeler();
-  final ImageLabeler _cloudImageLabeler =
-      FirebaseVision.instance.cloudImageLabeler();
-  final TextRecognizer _recognizer = FirebaseVision.instance.textRecognizer();
-  final TextRecognizer _cloudRecognizer =
-      FirebaseVision.instance.cloudTextRecognizer();
-  final DocumentTextRecognizer _cloudDocumentRecognizer =
-      FirebaseVision.instance.cloudDocumentTextRecognizer();
+  final FaceDetector _faceDetector =
+      FirebaseVision.instance.faceDetector(FaceDetectorOptions(
+    enableLandmarks: true,
+    enableClassification: true,
+    enableTracking: true,
+  ));
 
   @override
   void initState() {
@@ -59,7 +54,7 @@ class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
 
       ScannerUtils.detect(
         image: image,
-        detectInImage: _getDetectionMethod(),
+        detectInImage: _faceDetector.processImage,
         imageRotation: description.sensorOrientation,
       ).then(
         (dynamic results) {
@@ -72,27 +67,6 @@ class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
         },
       ).whenComplete(() => _isDetecting = false);
     });
-  }
-
-  Future<dynamic> Function(FirebaseVisionImage image) _getDetectionMethod() {
-    switch (_currentDetector) {
-      case Detector.text:
-        return _recognizer.processImage;
-      case Detector.cloudText:
-        return _cloudRecognizer.processImage;
-      case Detector.cloudDocumentText:
-        return _cloudDocumentRecognizer.processImage;
-      case Detector.barcode:
-        return _barcodeDetector.detectInImage;
-      case Detector.label:
-        return _imageLabeler.processImage;
-      case Detector.cloudLabel:
-        return _cloudImageLabeler.processImage;
-      case Detector.face:
-        return _faceDetector.processImage;
-    }
-
-    return null;
   }
 
   Widget _buildResults() {
@@ -111,29 +85,8 @@ class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
       _camera.value.previewSize.width,
     );
 
-    switch (_currentDetector) {
-      case Detector.barcode:
-        if (_scanResults is! List<Barcode>) return noResultsText;
-        painter = BarcodeDetectorPainter(imageSize, _scanResults);
-        break;
-      case Detector.face:
-        if (_scanResults is! List<Face>) return noResultsText;
-        painter = FaceDetectorPainter(imageSize, _scanResults);
-        break;
-      case Detector.label:
-        if (_scanResults is! List<ImageLabel>) return noResultsText;
-        painter = LabelDetectorPainter(imageSize, _scanResults);
-        break;
-      case Detector.cloudLabel:
-        if (_scanResults is! List<ImageLabel>) return noResultsText;
-        painter = LabelDetectorPainter(imageSize, _scanResults);
-        break;
-      default:
-        assert(_currentDetector == Detector.text ||
-            _currentDetector == Detector.cloudText);
-        if (_scanResults is! VisionText) return noResultsText;
-        painter = TextDetectorPainter(imageSize, _scanResults);
-    }
+    if (_scanResults is! List<Face>) return noResultsText;
+    painter = FaceDetectorPainter(imageSize, _scanResults);
 
     return CustomPaint(
       painter: painter,
@@ -192,32 +145,8 @@ class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<Detector>>[
               const PopupMenuItem<Detector>(
-                child: Text('Detect Barcode'),
-                value: Detector.barcode,
-              ),
-              const PopupMenuItem<Detector>(
                 child: Text('Detect Face'),
                 value: Detector.face,
-              ),
-              const PopupMenuItem<Detector>(
-                child: Text('Detect Label'),
-                value: Detector.label,
-              ),
-              const PopupMenuItem<Detector>(
-                child: Text('Detect Cloud Label'),
-                value: Detector.cloudLabel,
-              ),
-              const PopupMenuItem<Detector>(
-                child: Text('Detect Text'),
-                value: Detector.text,
-              ),
-              const PopupMenuItem<Detector>(
-                child: Text('Detect Cloud Text'),
-                value: Detector.cloudText,
-              ),
-              const PopupMenuItem<Detector>(
-                child: Text('Detect Document Text'),
-                value: Detector.cloudDocumentText,
               ),
             ],
           ),
@@ -236,12 +165,7 @@ class _CameraPreviewScannerState extends State<CameraPreviewScanner> {
   @override
   void dispose() {
     _camera.dispose().then((_) {
-      _barcodeDetector.close();
       _faceDetector.close();
-      _imageLabeler.close();
-      _cloudImageLabeler.close();
-      _recognizer.close();
-      _cloudRecognizer.close();
     });
 
     _currentDetector = null;
