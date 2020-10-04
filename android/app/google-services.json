@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "200854332295",
+    "firebase_url": "https://fever-tracer-afb1f.firebaseio.com",
+    "project_id": "fever-tracer-afb1f",
+    "storage_bucket": "fever-tracer-afb1f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200854332295:android:f22ca03335a544510f6922",
+        "android_client_info": {
+          "package_name": "com.example.mr_doctor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "200854332295-qbvjivit6ue58nuaukqamldr7lfp6vv2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMWkgrxquSy0oS3x6AjQmMUahdrubLkJY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "200854332295-qbvjivit6ue58nuaukqamldr7lfp6vv2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

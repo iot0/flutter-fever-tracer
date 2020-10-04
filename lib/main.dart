@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mr_doctor/pages/tabs.dart';
 import 'package:mr_doctor/providers/device.dart';
+import 'package:mr_doctor/widgets/camera_preview_scanner.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  return runApp(
-    ChangeNotifierProvider(
-      create: (context) => DeviceProvider(),
-      child: MyApp(),
-    ),
-  );
-}
+void main() => runApp(
+      ChangeNotifierProvider(
+        create: (context) => DeviceProvider(),
+        child: MyApp(),
+      ),
+    );
 
 class MyApp extends StatelessWidget {
   @override
@@ -20,7 +18,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Fever Tracer",
-      home: AppTabBar(),
+      // home: AppTabBar(),
+      home: CameraPreviewScanner(),
     );
   }
 }
