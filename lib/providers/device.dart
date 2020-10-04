@@ -17,15 +17,20 @@ class DeviceProvider with ChangeNotifier {
 
   String status = "Idle";
   int deviceId;
-  double serialData;
   List<UsbDevice> devices;
+
   bool alert = false;
+  double serialData;
 
   void listen() {
     _setDevices();
     UsbSerial.usbEventStream.listen((UsbEvent event) async {
       _setDevices();
     });
+  }
+
+  void cancelAlert() {
+    alert = false;
   }
 
   void _setDevices() async {
@@ -95,13 +100,16 @@ class DeviceProvider with ChangeNotifier {
   }
 
   void _setData(String data) {
-    print("_transaction.stream:" + data);
+    // print("_transaction.stream:" + data);
     serialData = double.tryParse(data);
-    if (serialData > _threshold)
-      alert = true;
-    else
-      alert = false;
 
-    notifyListeners();
+    if (!alert) {
+      if (serialData > _threshold)
+        alert = true;
+      else
+        alert = false;
+
+      notifyListeners();
+    }
   }
 }

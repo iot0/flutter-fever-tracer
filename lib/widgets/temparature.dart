@@ -9,15 +9,18 @@ class TemparatureWidget extends StatefulWidget {
 }
 
 class _TemparatureState extends State<TemparatureWidget> {
-  double _value;
-  bool _alert = false;
+  _onAlert(DeviceProvider provider) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showSnackbar(provider);
+    });
+  }
 
-  showSnackbar(context) {
+  _showSnackbar(DeviceProvider provider) {
     FlutterRingtonePlayer.playAlarm();
 
     final snackBar = SnackBar(
       // the duration of your snack-bar
-      duration: Duration(milliseconds: 60000),
+      duration: Duration(milliseconds: 5000),
       content: Row(
         children: <Widget>[
           // add your preferred icon here
@@ -44,9 +47,7 @@ class _TemparatureState extends State<TemparatureWidget> {
 
     snackbarResult.closed.then((value) {
       FlutterRingtonePlayer.stop();
-      setState(() {
-        _alert = false;
-      });
+      provider.cancelAlert();
     });
   }
 
@@ -60,22 +61,15 @@ class _TemparatureState extends State<TemparatureWidget> {
   Widget build(BuildContext context) {
     return Consumer<DeviceProvider>(
       builder: (context, provider, child) {
-        if (provider.alert && !_alert) {
-          _alert = true;
-          _value = provider.serialData;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showSnackbar(context);
-          });
+        if (provider.alert) {
+          _onAlert(provider);
         }
 
-        if (!_alert) _value = provider.serialData;
-
         return Text(
-          _value != null ? "$_value" : "No Data",
+          provider.serialData != null ? "${provider.serialData}" : "",
           style: new TextStyle(
-            fontSize: 20.0,
-            color: _alert ? Colors.red : Colors.grey,
-          ),
+              fontSize: 24.0,
+              color: provider.alert ? Colors.red : Colors.white),
         );
       },
     );
