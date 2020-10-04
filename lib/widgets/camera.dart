@@ -17,7 +17,7 @@ class Camera extends StatefulWidget {
 
 class _CameraState extends State<Camera> {
   CameraController _camera;
-  CameraLensDirection _direction = CameraLensDirection.back;
+  CameraLensDirection _direction = CameraLensDirection.front;
   bool _isDetecting = false;
 
   @override

@@ -10,15 +10,15 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() async {
+  void initState() {
     super.initState();
 
-    await ScannerUtils.loadModel();
-
-    Timer(
-        Duration(seconds: 1),
-        () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (BuildContext context) => HomePage())));
+    ScannerUtils.loadModel().then((value) {
+      Timer(
+          Duration(seconds: 3 ),
+          () => Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (BuildContext context) => HomePage())));
+    });
   }
 
   @override
@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Image.asset('assets/logo.png'),
+        child: Image.asset('assets/logo.jpg'),
       ),
     );
   }

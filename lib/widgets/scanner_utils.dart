@@ -3,16 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:mr_doctor/core/constants.dart';
 import 'package:tflite/tflite.dart';
-
-const String ssd = "SSD MobileNet";
-const String yolo = "Tiny YOLOv2";
 
 class ScannerUtils {
   ScannerUtils._();
@@ -37,7 +33,7 @@ class ScannerUtils {
     return _model;
   }
 
-  static loadModel() async {
+  static Future<void> loadModel() async {
     Tflite.close();
     try {
       String res;

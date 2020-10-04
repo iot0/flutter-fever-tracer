@@ -34,11 +34,14 @@ class _TabCameraState extends State<TabCamera> {
   int _imageWidth = 0;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
   }
 
   setRecognitions(recognitions, imageHeight, imageWidth) {
+    print("_recognitions");
+    print(recognitions);
+
     setState(() {
       _recognitions = recognitions;
       _imageHeight = imageHeight;
