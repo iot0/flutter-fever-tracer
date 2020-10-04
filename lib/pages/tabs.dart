@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'view.dart';
-import 'home.dart';
+import 'package:mr_doctor/pages/tab_camera.dart';
+import 'package:mr_doctor/pages/tab_settings.dart';
 
 class AppTabBar extends StatelessWidget {
   @override
@@ -18,7 +18,7 @@ class AppTabBar extends StatelessWidget {
           title: Text('Fever Tracer'),
         ),
         body: TabBarView(
-          children: [HomePage(), ViewTab()],
+          children: [TabCamera(), TabSettings()],
         ),
       ),
     );
