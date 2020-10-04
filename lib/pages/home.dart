@@ -3,7 +3,7 @@ import 'package:mr_doctor/pages/tab_camera.dart';
 import 'package:mr_doctor/pages/tab_settings.dart';
 import 'package:mr_doctor/widgets/temparature.dart';
 
-class AppTabBar extends StatelessWidget {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

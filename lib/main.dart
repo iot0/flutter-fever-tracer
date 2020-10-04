@@ -1,5 +1,6 @@
+import 'package:animated_splash/animated_splash.dart';
 import 'package:flutter/material.dart';
-import 'package:mr_doctor/pages/tabs.dart';
+import 'package:mr_doctor/pages/home.dart';
 import 'package:mr_doctor/providers/device.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Fever Tracer",
-      home: AppTabBar(),
+      home: AnimatedSplash(
+        imagePath: 'assets/logo.jpg',
+        home: HomePage(),
+        duration: 2500,
+        type: AnimatedSplashType.StaticDuration,
+      ),
     );
   }
 }
