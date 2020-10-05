@@ -1,24 +1,27 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mr_doctor/widgets/scanner_utils.dart';
 import 'dart:math' as math;
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
 
 typedef void Callback(List<dynamic> list, int h, int w);
 
 class Camera extends StatefulWidget {
   final Callback setRecognitions;
+  final bool takePhoto;
 
-  Camera(this.setRecognitions);
+  Camera(this.setRecognitions, this.takePhoto);
 
   @override
   _CameraState createState() => new _CameraState();
 }
 
-class _CameraState extends State<Camera> {
+class _CameraState extends State<Camera> with WidgetsBindingObserver {
   CameraController _camera;
   CameraLensDirection _direction = CameraLensDirection.front;
   bool _isDetecting = false;
+  bool _savingPhoto = false;
 
   @override
   void initState() {
@@ -44,6 +47,38 @@ class _CameraState extends State<Camera> {
     });
   }
 
+  _takePicture() async {
+    // Take the Picture in a try / catch block. If anything goes wrong,
+    // catch the error.
+    try {
+      _savingPhoto = true;
+      final dir = (await getExternalStorageDirectory()).path;
+
+      // Construct the path where the image should be saved using the
+      // pattern package.
+      final path = join(
+        // Store the picture in the temp directory.
+        // Find the temp directory using the `path_provider` plugin.
+        dir,
+        '${DateTime.now()}.png',
+      );
+
+      // Attempt to take a picture and log where it's been saved.
+      await _camera.takePicture(path);
+      showSnackbar("Photo saved");
+      _savingPhoto = false;
+    } catch (e) {
+      // If an error occurs, log the error to the console.
+      print(e);
+      _savingPhoto = false;
+    }
+  }
+
+  showSnackbar(message) {
+    final snackBar = SnackBar(content: Text(message));
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
+
   @override
   void dispose() {
     _camera?.dispose();
@@ -53,7 +88,12 @@ class _CameraState extends State<Camera> {
   @override
   Widget build(BuildContext context) {
     if (_camera == null || !_camera.value.isInitialized) {
-      return Container();
+      return Center(child: CircularProgressIndicator());
+    }
+
+    // Take photo
+    if (widget.takePhoto && !_savingPhoto) {
+      _takePicture();
     }
 
     var tmp = MediaQuery.of(context).size;
@@ -72,5 +112,12 @@ class _CameraState extends State<Camera> {
           screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
       child: CameraPreview(_camera),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _initializeCamera();
+    }
   }
 }

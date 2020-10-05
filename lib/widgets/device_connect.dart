@@ -14,7 +14,6 @@ class DeviceConnectWidget extends StatelessWidget {
           devices.add(ListTile(
               leading: Icon(Icons.usb),
               title: Text(device.productName ?? "null"),
-              subtitle: Text(device.manufacturerName ?? "null"),
               trailing: RaisedButton(
                 child: Text(provider.deviceId == device.deviceId
                     ? "Disconnect"
