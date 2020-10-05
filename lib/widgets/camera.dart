@@ -8,10 +8,9 @@ import 'package:path_provider/path_provider.dart';
 typedef void Callback(List<dynamic> list, int h, int w);
 
 class Camera extends StatefulWidget {
-  final Callback setRecognitions;
   final bool takePhoto;
 
-  Camera(this.setRecognitions, this.takePhoto);
+  Camera(this.takePhoto);
 
   @override
   _CameraState createState() => new _CameraState();
@@ -21,7 +20,8 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
   CameraController _camera;
   CameraLensDirection _direction = CameraLensDirection.front;
   bool _isDetecting = false;
-  bool _savingPhoto = false;
+  bool _isCapturingPicture = false;
+  bool _isPhotoSaved = false;
 
   @override
   void initState() {
@@ -36,42 +36,57 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
     _camera = CameraController(description, ResolutionPreset.high);
     await _camera.initialize();
 
-    _camera.startImageStream((CameraImage image) {
-      if (!_isDetecting) {
-        _isDetecting = true;
+    setState(() {});
+  }
 
-        ScannerUtils.detect(image).then((recognitions) {
-          widget.setRecognitions(recognitions, image.height, image.width);
-        }).whenComplete(() => _isDetecting = false);
+  _onRecognition(recognitions) {
+    print("_onRecognition");
+
+    if (_isPhotoSaved || _isCapturingPicture) return;
+    // The following lines of code toggle the wakelock based on a bool value.
+    bool isPersion = false;
+    for (var i = 0; i < recognitions.length; i++) {
+      if (recognitions[i]["detectedClass"] == "person" &&
+          recognitions[i]["confidenceInClass"] > .5) {
+        isPersion = true;
+        break;
       }
-    });
+    }
+
+    // Take photo
+    if (widget.takePhoto && isPersion) {
+      _camera.stopImageStream().then((value) => _takePicture());
+    }
   }
 
   _takePicture() async {
+    print("_takePicture");
     // Take the Picture in a try / catch block. If anything goes wrong,
     // catch the error.
-    try {
-      _savingPhoto = true;
-      final dir = (await getExternalStorageDirectory()).path;
+    // try {
+    _isCapturingPicture = true;
+    final dir = (await getExternalStorageDirectory()).path;
 
-      // Construct the path where the image should be saved using the
-      // pattern package.
-      final path = join(
-        // Store the picture in the temp directory.
-        // Find the temp directory using the `path_provider` plugin.
-        dir,
-        '${DateTime.now()}.png',
-      );
+    // Construct the path where the image should be saved using the
+    // pattern package.
+    final path = join(
+      // Store the picture in the temp directory.
+      // Find the temp directory using the `path_provider` plugin.
+      dir,
+      '${DateTime.now()}.png',
+    );
 
-      // Attempt to take a picture and log where it's been saved.
-      await _camera.takePicture(path);
-      showSnackbar("Photo saved");
-      _savingPhoto = false;
-    } catch (e) {
-      // If an error occurs, log the error to the console.
-      print(e);
-      _savingPhoto = false;
-    }
+    // Attempt to take a picture and log where it's been saved.
+    await _camera.takePicture(path);
+    showSnackbar("Photo saved");
+    _isPhotoSaved = true;
+    _isCapturingPicture = false;
+    // } catch (e) {
+    //   // If an error occurs, log the error to the console.
+    //   print(e);
+    //   _isPhotoSaved = false;
+    //   _isCapturingPicture = false;
+    // }
   }
 
   showSnackbar(message) {
@@ -91,9 +106,16 @@ class _CameraState extends State<Camera> with WidgetsBindingObserver {
       return Center(child: CircularProgressIndicator());
     }
 
-    // Take photo
-    if (widget.takePhoto && !_savingPhoto) {
-      _takePicture();
+    if (widget.takePhoto) {
+      _camera.startImageStream((CameraImage image) {
+        if (!_isDetecting) {
+          _isDetecting = true;
+
+          ScannerUtils.detect(image).then((recognitions) {
+            _onRecognition(recognitions);
+          }).whenComplete(() => _isDetecting = false);
+        }
+      });
     }
 
     var tmp = MediaQuery.of(context).size;
