@@ -59,6 +59,9 @@ flutter:
     - assets/tflite/ssd_mobilenet.txt
     - assets/tflite/yolov2_tiny.tflite
     - assets/tflite/yolov2_tiny.txt
+    - assets/tflite/mobilenet_v1_1.0_224.tflite
+    - assets/tflite/mobilenet_v1_1.0_224.txt
+    - assets/tflite/posenet_mv1_075_float_from_checkpoints.tflite
     - assets/logo.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see

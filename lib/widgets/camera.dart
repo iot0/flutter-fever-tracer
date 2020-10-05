@@ -30,12 +30,7 @@ class _CameraState extends State<Camera> {
     final CameraDescription description =
         await ScannerUtils.getCamera(_direction);
 
-    _camera = CameraController(
-      description,
-      defaultTargetPlatform == TargetPlatform.iOS
-          ? ResolutionPreset.low
-          : ResolutionPreset.medium,
-    );
+    _camera = CameraController(description, ResolutionPreset.high);
     await _camera.initialize();
 
     _camera.startImageStream((CameraImage image) {

@@ -71,7 +71,7 @@ class ScannerUtils {
     int endTime = new DateTime.now().millisecondsSinceEpoch;
     print("Detection took ${endTime - startTime}");
 
-    return recognitions;
+    return await recognitions;
   }
 
   static _yolov2Tiny(CameraImage image) async {
